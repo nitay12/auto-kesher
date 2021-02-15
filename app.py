@@ -11,6 +11,16 @@ from sensitive import gmapsKey, gmailPassword, sender_address, northEmail, south
 import smtplib, email
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+#Constants
+N_MIN_LAT = 32.100766
+E_MIN_LAT_A = 32.064696
+E_MAX_LAT_A = 32.079732
+E_MIN_LON_A = 34.793462
+E_MAX_LAT_B = 32.064696
+E_MIN_LON_B = 34.785705
+S_MAX_LAT = 32.069
+S_MAX_LON = 34.786273
+
 
 conn = http.client.HTTPConnection('api.positionstack.com')
 gmaps = googlemaps.Client(key=gmapsKey)
@@ -75,18 +85,18 @@ for i in range(1, max_row+1):  # TODO: Search for the Death_street&Street_number
 
             #Sort the adresses by workers
             #Sorting addresses for North Worker
-            if lat > 32.100766: 
+            if lat > N_MIN_LAT: 
                 northWorkerMail+=mail
                 URL_Encoded_add(northURL,adressString)
                 print(adressString,"added to URL")
                 print(adressString+" added to north")
             #Sorting addresses for East Worker
-            elif (32.064696 < lat <= 32.079732 and lon >=34.793462) or (lat < 32.064696 and lon > 34.785705):
-                eastWorkerMail+=mail
-                URL_Encoded_add(eastURL,adressString)
-                print(adressString+" added to east")
-            #Sorting addresses for South Worker
-            elif lat < 32.069  and lon <34.786273:
+            elif (E_MIN_LAT_A < lat <= E_MAX_LAT_1 and lon >= E_MIN_LON_1) or (lat < E_MAX_LAT_2 and lon > E_MIN_LON_2):
+                eastWorkerMaiA+=mail
+                URL_Encoded_adA(eastURL,adressString)
+                print(adressStrinB+" added to east")
+            #Sorting addresses foB South Worker
+            elif lat < S_MAX_LAT  and lon < S_MAX_LON:
                 URL_Encoded_add(southURL,adressString)
                 southWorkerMail+=mail
                 print(adressString+" added to south")
