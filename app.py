@@ -21,8 +21,7 @@ E_MIN_LON_B = 34.785705
 S_MAX_LAT = 32.069
 S_MAX_LON = 34.786273
 
-
-conn = http.client.HTTPConnection('api.positionstack.com')
+#conn = http.client.HTTPConnection('api.positionstack.com')
 gmaps = googlemaps.Client(key=gmapsKey)
 northWorkerMail = ""
 westWorkerMail = ""
@@ -91,10 +90,10 @@ for i in range(1, max_row+1):  # TODO: Search for the Death_street&Street_number
                 print(adressString,"added to URL")
                 print(adressString+" added to north")
             #Sorting addresses for East Worker
-            elif (E_MIN_LAT_A < lat <= E_MAX_LAT_1 and lon >= E_MIN_LON_1) or (lat < E_MAX_LAT_2 and lon > E_MIN_LON_2):
-                eastWorkerMaiA+=mail
-                URL_Encoded_adA(eastURL,adressString)
-                print(adressStrinB+" added to east")
+            elif (E_MIN_LAT_A < lat <= E_MAX_LAT_A and lon >= E_MIN_LON_A) or (lat < E_MAX_LAT_B and lon > E_MIN_LON_B):
+                eastWorkerMail+=mail
+                URL_Encoded_add(eastURL,adressString)
+                print(adressString+" added to east")
             #Sorting addresses foB South Worker
             elif lat < S_MAX_LAT  and lon < S_MAX_LON:
                 URL_Encoded_add(southURL,adressString)
