@@ -20,36 +20,35 @@ E_MAX_LAT_B = 32.064696
 E_MIN_LON_B = 34.785705
 S_MAX_LAT = 32.069
 S_MAX_LON = 34.786273
+MAP_URL = "http://maps.google.com/maps?"
 
 #conn = http.client.HTTPConnection('api.positionstack.com')
 gmaps = googlemaps.Client(key=gmapsKey)
-northWorkerMail = ""
-westWorkerMail = ""
-southWorkerMail = ""
-eastWorkerMail = ""
-mails = [northWorkerMail, westWorkerMail, southWorkerMail, eastWorkerMail]
+north_addresses = ""
+west_addresses = ""
+south_addresses = ""
+east_addresses = ""
 errors = []
-errorsMail = ""
 
-northURL = ["http://maps.google.com/maps?"]
-eastURL = ["http://maps.google.com/maps?"]
-westURL = ["http://maps.google.com/maps?"]
-southURL = ["http://maps.google.com/maps?"]
+north_url = [MAP_URL]
+east_url = [MAP_URL]
+west_url = [MAP_URL]
+south_url = [MAP_URL]
 
-def URL_Encoded_add(workerURL ,address):
+def URL_Encoded_add(employee_url ,address):
     encodedAddress = re.sub('\W+',' ', address)
     encodedAddress = encodedAddress.replace(" ", "+")
-    if "saddr" not in workerURL[0]:
+    if "saddr" not in employee_url[0]:
         print ("adding saddr: ")
-        workerURL[0]+="saddr="+encodedAddress
-    elif "daddr" not in workerURL[0]:
+        employee_url[0]+="saddr="+encodedAddress
+    elif "daddr" not in employee_url[0]:
         print ("adding daddr: ")
-        workerURL[0]+= "&daddr=" + encodedAddress
-    elif "daddr" in workerURL[0]:
+        employee_url[0]+= "&daddr=" + encodedAddress
+    elif "daddr" in employee_url[0]:
         print ("adding to: ")
-        workerURL[0]+= "+to:" + encodedAddress
+        employee_url[0]+= "+to:" + encodedAddress
     print(encodedAddress)
-    print(workerURL[0])
+    print(employee_url[0])
 
 # getting the adresses from Excel file
 print ("getting adresses")
@@ -67,7 +66,6 @@ for i in range(1, max_row+1):  # TODO: Search for the Death_street&Street_number
     phone = ws.cell(row=i, column=8)
     adressString = str(street.value)+" "+str(street_num.value)+" "+str(city.value)
     mail =  "כתובת: {} \n שם: {} שם משפחה:{} \n תאריך: {} \n טלפון: {} קרבה: {} \n\n".format(adressString, firstName.value, familyName.value, dateDead.value, phone.value, deadConection.value)
-    mails.append(mail)
     print(mail)
 
     if adressString == "None None None":
@@ -85,40 +83,40 @@ for i in range(1, max_row+1):  # TODO: Search for the Death_street&Street_number
             #Sort the adresses by workers
             #Sorting addresses for North Worker
             if lat > N_MIN_LAT: 
-                northWorkerMail+=mail
-                URL_Encoded_add(northURL,adressString)
+                north_addresses+=mail
+                URL_Encoded_add(north_url,adressString)
                 print(adressString,"added to URL")
                 print(adressString+" added to north")
             #Sorting addresses for East Worker
             elif (E_MIN_LAT_A < lat <= E_MAX_LAT_A and lon >= E_MIN_LON_A) or (lat < E_MAX_LAT_B and lon > E_MIN_LON_B):
-                eastWorkerMail+=mail
-                URL_Encoded_add(eastURL,adressString)
+                east_addresses+=mail
+                URL_Encoded_add(east_url,adressString)
                 print(adressString+" added to east")
             #Sorting addresses foB South Worker
             elif lat < S_MAX_LAT  and lon < S_MAX_LON:
-                URL_Encoded_add(southURL,adressString)
-                southWorkerMail+=mail
+                URL_Encoded_add(south_url,adressString)
+                south_addresses+=mail
                 print(adressString+" added to south")
             #Sorting addresses for West Worker
             else:
-                westWorkerMail+=mail
-                URL_Encoded_add(westURL,adressString)
+                west_addresses+=mail
+                URL_Encoded_add(west_url,adressString)
                 print(adressString+" added to west")
         except:
             print("Error occurred")
             errors.append(adressString)
-northWorkerMail+= "קישור: "+northURL[0]+"\n"
-eastWorkerMail+= "קישור: "+eastURL[0]+"\n"
-westWorkerMail+= "קישור: "+westURL[0]+"\n"
-southWorkerMail+="קישור: "+southURL[0]+"\n"
+north_addresses+= "קישור: "+north_url[0]+"\n"
+east_addresses+= "קישור: "+east_url[0]+"\n"
+west_addresses+= "קישור: "+west_url[0]+"\n"
+south_addresses+="קישור: "+south_url[0]+"\n"
 print("*צפון*")
-print(northWorkerMail)
+print(north_addresses)
 print("*דרום*")
-print(southWorkerMail)
+print(south_addresses)
 print("*מרכז*")
-print(westWorkerMail)
+print(west_addresses)
 print("*מזרח*")
-print(eastWorkerMail)
+print(east_addresses)
 print("*לא התמיין*")
 print(errors)
 
@@ -140,14 +138,14 @@ def send_mail(workerEmail, content, zone):
   text = message.as_string()
   session.sendmail(sender_address, receiver_address, text)
   session.quit()
-print ("sending mails")
-send_mail(northEmail,northWorkerMail, " צפון ")
-print("mail sent to north Worker")
-send_mail(northEmail,eastWorkerMail, " מזרח ")
-print("mail sent to east Worker")
-send_mail(westEmail,westWorkerMail, " מרכז ")
-print("mail sent to west Worker")
-send_mail(southEmail,southWorkerMail, " דרום ")
-print("mail sent to south Worker")
-#send_mail(office@ytlv.co.il,"הכתובות הבאות נשלחו באופן אוטומטי למיילים של העובדים\n"+northWorkerMail+eastWorkerMail+southWorkerMail+westWorkerMail, "כתובות אוטומתי")
-print("mails sent")
+#print ("sending mails")
+#send_mail(northEmail,north_addresses, " צפון ")
+#print("mail sent to north Worker")
+#send_mail(northEmail,east_addresses, " מזרח ")
+#print("mail sent to east Worker")
+#send_mail(westEmail,west_addresses, " מרכז ")
+#print("mail sent to west Worker)
+#send_mail(southEmail,south_addresses, " דרום ")
+#print("mail sent to south Worker")
+#send_mail(office@ytlv.co.il,"הכתובות הבאות נשלחו באופן אוטומטי למיילים של העובדים\n"+north_addresses+east_addresses+south_addresses+west_addresses, "כתובות אוטומתי")
+print("mails")
