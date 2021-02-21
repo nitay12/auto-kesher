@@ -6,12 +6,12 @@ import json
 import googlemaps
 import re
 
-from sensitive import gmapsKey, gmailPassword, sender_address, north_email, south_email, east_email, west_email
+from sensitive import gmapsKey, gmailPassword, sender_address
 
 import smtplib, email
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-def addresses_sort():
+def addresses_sort(file_path):
     #Constants
     N_MIN_LAT = 32.100766
     E_MIN_LAT_A = 32.064696
@@ -53,7 +53,7 @@ def addresses_sort():
 
     # getting the adresses from Excel file
     print ("getting adresses")
-    wb = lwb('שאלתא לישיבה.xlsx')
+    wb = lwb(file_path)
     ws = wb.active
     max_row = ws.max_row
     for i in range(1, 2):#max_row+1):  # TODO: Search for the Death_street&Street_number columns
@@ -104,7 +104,6 @@ def addresses_sort():
                     URL_Encoded_add(west_url,adressString)
                     print(adressString+" added to west")
             except:
-                print("Error occurred")
                 errors.append(adressString)
     north_addresses+= "קישור: "+north_url[0]+"\n"
     east_addresses+= "קישור: "+east_url[0]+"\n"
@@ -139,14 +138,3 @@ def send_mail(workerEmail, content, zone):
     text = message.as_string()
     session.sendmail(sender_address, receiver_address, text)
     session.quit()
-#print ("sending mails")
-#send_mail(northEmail,north_addresses, " צפון ")
-#print("mail sent to north Worker")
-#send_mail(northEmail,east_addresses, " מזרח ")
-#print("mail sent to east Worker")
-#send_mail(westEmail,west_addresses, " מרכז ")
-#print("mail sent to west Worker)
-#send_mail(southEmail,south_addresses, " דרום ")
-#print("mail sent to south Worker")
-#send_mail(office@ytlv.co.il,"הכתובות הבאות נשלחו באופן אוטומטי למיילים של העובדים\n"+north_addresses+east_addresses+south_addresses+west_addresses, "כתובות אוטומתי")
-
