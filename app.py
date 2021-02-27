@@ -11,6 +11,7 @@ from sensitive import gmapsKey, gmailPassword, sender_address
 import smtplib, email
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 def addresses_sort(file_path):
     #Constants
     N_MIN_LAT = 32.100766
@@ -23,7 +24,18 @@ def addresses_sort(file_path):
     S_MAX_LON = 34.786273
     MAP_URL = "http://maps.google.com/maps?"
     G_MAPS = googlemaps.Client(key=gmapsKey)
-
+    #Getting columns from JSON
+    with open ("config.json") as config:
+            settings = json.load(config)
+            columns = settings["columns"]
+            date_col = int(columns["dateDead"])
+            family_col = int(columns["familyName"])
+            name_col = int(columns["firstName"])
+            street_col = int(columns["street"])
+            street_num_col = int(columns["street_num"])
+            city_col = int(columns["city"])
+            conection_col = int(columns["deadConection"])
+            phone_col = int(columns["phone"])
     #conn = http.client.HTTPConnection('api.positionstack.com')
     north_addresses = ""
     west_addresses = ""
@@ -52,19 +64,18 @@ def addresses_sort(file_path):
         print(employee_url[0])
 
     # getting the adresses from Excel file
-    print ("getting adresses")
     wb = lwb(file_path)
     ws = wb.active
     max_row = ws.max_row
-    for i in range(1, 2):#max_row+1):  # TODO: Search for the Death_street&Street_number columns
-        dateDead = ws.cell(row=i, column=1)
-        familyName = ws.cell(row=i, column=2)
-        firstName = ws.cell(row=i, column=3)
-        street = ws.cell(row=i, column=4)
-        street_num = ws.cell(row=i, column=5)
-        city = ws.cell(row=i, column=6)
-        deadConection = ws.cell(row=i, column=7)
-        phone = ws.cell(row=i, column=8)
+    for i in range(1, max_row+1):  # TODO: Search for the Death_street&Street_number columns
+        dateDead = ws.cell(row=i, column=date_col)
+        familyName = ws.cell(row=i, column=family_col)
+        firstName = ws.cell(row=i, column=name_col)
+        street = ws.cell(row=i, column=street_col)
+        street_num = ws.cell(row=i, column=street_num_col)
+        city = ws.cell(row=i, column=city_col)
+        deadConection = ws.cell(row=i, column=conection_col)
+        phone = ws.cell(row=i, column=phone_col)
         adressString = str(street.value)+" "+str(street_num.value)+" "+str(city.value)
         mail =  "כתובת: {} \n שם: {} שם משפחה:{} \n תאריך: {} \n טלפון: {} קרבה: {} \n\n".format(adressString, firstName.value, familyName.value, dateDead.value, phone.value, deadConection.value)
         print(mail)
@@ -73,7 +84,7 @@ def addresses_sort(file_path):
             continue
         else:
 
-    # Forward geocoding the adresses
+    # Forward geocoding the adress
             try:  
                 res = G_MAPS.geocode(adressString)  # conn.getresponse()
                 lat = float(res[0]['geometry']['location']['lat'])
@@ -109,17 +120,8 @@ def addresses_sort(file_path):
     east_addresses+= "קישור: "+east_url[0]+"\n"
     west_addresses+= "קישור: "+west_url[0]+"\n"
     south_addresses+="קישור: "+south_url[0]+"\n"
-    print("*צפון*")
-    print(north_addresses)
-    print("*דרום*")
-    print(south_addresses)
-    print("*מרכז*")
-    print(west_addresses)
-    print("*מזרח*")
-    print(east_addresses)
-    print("*לא התמיין*")
-    print(errors)
     return {"north":north_addresses,"east":east_addresses,"south":south_addresses,"west":west_addresses}
+
 def send_mail(workerEmail, content, zone):
     #The mail addresses and password
     receiver_address = workerEmail
